@@ -1,0 +1,291 @@
+################# Normal distribution of the natural frequencies ###################
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+t0 = 0 #starting time
+T = 100 #final time
+dt = 0.01 #timestep
+N = 1000 #number of oscilators
+dK = 0.2 #coupling step
+
+## Find omega through normal distribution
+omegaa = np.random.normal(0,1,1000)   
+omega = omegaa.tolist()
+
+## Find theta for t=0 through random uniform distribution
+theta0 = np.random.uniform(0,2*np.pi,1000)
+
+##Set values of array for t=0 equal to theta0
+old_theta = np.array(theta0)
+
+##Create an empty list and append theta0
+theta_list = []
+theta_list.append(old_theta)
+
+## Create empty list to save the order parameters
+order_par = []
+
+for k in np.arange(0,5,dK):
+    old_theta = theta0
+    for t in np.arange(0,100,dt): 
+      cos = 0
+      sin = 0
+      r = 0
+      cos = np.cos(old_theta)
+      sin = np.sin(old_theta)
+      mean_cos =np.mean(cos)
+      mean_sin = np.mean(sin)
+      r = np.sqrt(mean_cos**2 + mean_sin**2)
+      order_par.append(r)
+      old_theta =  old_theta + dt*(omegaa + k*r*np.sin(sum(old_theta)/N - old_theta))
+      theta_list.append(old_theta)
+      print(t)
+    
+
+## From the order parameter list, per 10000 steps --> k is changed
+## We want r(T) --> last item (10000-1) from t=0 and then going up with step= 10000
+par = []
+for i in range(9999,len(order_par),10000):
+    par.append(order_par[i])
+
+
+time = np.arange(0,100,0.01)  
+
+## Plot coupling constant K with the coherence r(T)
+number_of_k = np.arange(0,5,0.2)
+plt.plot(number_of_k,par, label = 'Numerical solution', color = 'black')
+plt.xlabel('Coupling constant K')
+plt.ylabel('Coherence r(T)')
+plt.axvline(x=1.6, color = 'b', label = 'Critical Value', linestyle = '--')
+plt.legend()
+
+## Comparison with equation 6
+##Solving for r(T) and K 
+
+number_of_k = np.arange(0,5,0.2)
+
+##Convert the previous par list with r(T) to array, in order to compute
+par_array = np.array(par)
+
+##Import library to compute the quad
+import scipy.integrate
+
+## Save the integration values in a list
+integration_list = []
+for (i,j) in zip(number_of_k,par_array):
+    f= lambda x: (1/np.sqrt(pi*2))*i * np.cos(x)**2 * np.exp(-0.5*(i**2)
+    *(np.sin(x)**2)*(j**2))
+    a = scipy.integrate.quad(f, -pi/2, pi/2)
+    integration_list.append(a)
+    
+intergration_list = np.array
+## Keep only the integration values and not the errors
+integ = []
+for i in range(0,25):
+    integ.append(integration_list[i][0])
+
+##Plot integ with coupling constants K
+plt.plot(number_of_k,integ, color = 'black')
+plt.xlabel('Coupling constant K')
+plt.ylabel('Integral values ')
+plt.axhline(y=1, color = 'r', linestyle = '--')
+plt.axvline(x=1.6, color = 'b', linestyle = '--')
+
+## Run now the model for K=1, and K=2
+order_par_1 = []
+order_par_2 = [] 
+
+## Reset old_theta as theta0 to run the model for K=1 and K=2
+for k in range(1,2):
+    old_theta = theta0
+    for t in np.arange(0,100,0.01): 
+      cos = 0
+      sin = 0
+      r = 0
+      cos = np.cos(old_theta)
+      sin = np.sin(old_theta)
+      mean_cos =np.mean(cos)
+      mean_sin = np.mean(sin)
+      r = np.sqrt(mean_cos**2 + mean_sin**2)
+      if k ==1:
+          order_par_1.append(r)
+      elif k==2:
+          order_par_2.append(r)
+      print(t)
+      old_theta =  old_theta + dt*(omegaa + k*r*np.sin(sum(old_theta)/N - old_theta))
+      theta_list.append(old_theta)
+      print(t)
+
+time = np.arange(0,100,0.01)
+
+fig1 = plt.figure(1)
+plt.plot(time,order_par_1)
+
+fig2 = plt.figure(2)
+plt.plot(time, order_par_2)
+
+## Plot coherence parameters for K=1 and K=2 in the same graph
+num_plots = 2 
+colormap = plt.cm.brg
+plt.gca().set_prop_cycle(plt.cycler('color', plt.cm.brg(np.linspace(0, 1, num_plots))))
+plt.plot(time, order_par_1, time, order_par_2)
+plt.legend(['K=1', 'K=2'])
+plt.ylim(0,1)
+plt.xlabel('Time')
+plt.ylabel('Coherence')
+
+
+####################### Natural frequencies uniformly distributed ####################
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+t0 = 0 #starting time
+T2 = 200 #final time
+dt2 = 0.05 #timestep
+N2 = 2000 #number of oscilators
+dK2 = 0.03 #coupling step
+
+
+## Find omega through uniform distribution
+omegaa2 = np.random.uniform(-1/2,1/2,2000)   
+omega2 = omegaa2.tolist()
+
+## Find theta for t=0 through random uniform distribution
+theta0 = np.random.uniform(0,2*np.pi,2000)
+
+##Set values of array for t=0 equal to theta0
+old_theta2 = np.array(theta0)
+
+##Create an empty list and append theta0
+theta_list2 = []
+theta_list2.append(old_theta2)
+
+## Create empty list to save the order parameters
+order_par2 = []
+for k in np.arange(0,1.5,0.03):
+    old_theta2 = theta0
+    for t in np.arange(0,200,0.05): 
+      cos2 = 0
+      sin2 = 0
+      r2 = 0
+      cos2 = np.cos(old_theta2)
+      sin2 = np.sin(old_theta2)
+      mean_cos2 =np.mean(cos2)
+      mean_sin2= np.mean(sin2)
+      r2= np.sqrt(mean_cos2**2 + mean_sin2**2)
+      order_par2.append(r2)
+      old_theta2 =  old_theta2 + dt2*(omegaa2 + k*r2*np.sin(sum(old_theta2)/N2 - old_theta2))
+      theta_list2.append(old_theta2)
+      print(t)
+      
+## From the order parameter list, per 4000 steps --> k is changed  
+## We want r(T) --> last item (4000-1) from t=0 and then going up with step= 4000
+par2 = []
+for i in range(3999,len(order_par2),4000):
+    par2.append(order_par2[i])
+
+number_of_k2 = np.arange(0,1.5,0.03)   
+time2 = np.arange(0,200,dt2) 
+critical_constant = 2/np.pi
+
+
+plt.plot(number_of_k2, par2, color = 'black', label = 'Numerical solution')
+plt.xlabel('Coupling constant K')
+plt.ylabel('Coherence parameter r(T)')
+plt.axvline(x=critical_constant, color = 'b', label = 'Critical Value', linestyle = '--')
+plt.legend(loc=(0.6, 0.05))
+
+
+################## Fixed realisation of the natural frequencies ########################
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+## Create empty list to store the new thetas'
+theta_list_new = []
+## Create empty list to store the new coherences
+order_par_new = []
+
+dt2 = 0.05 #timestep
+N2 = 2000 #number of oscilators
+
+## Keep omega the same for all the runs
+omegaa2  = np.random.uniform(-1/2, 1/2, 2000)
+
+## For 10 runs
+for j in range(0,10):
+    old_theta2 = np.random.uniform(0,2*np.pi,2000) #change theta in every run from a uniform distribution
+    for t in np.arange(0,50,0.05): 
+      cos_new = 0
+      sin_new = 0
+      r_new = 0
+      cos_new = np.cos(old_theta2)
+      sin_new = np.sin(old_theta2)
+      mean_cos_new =np.mean(cos_new)
+      mean_sin_new= np.mean(sin_new)
+      r_new= np.sqrt(mean_cos_new**2 + mean_sin_new**2)
+      order_par_new.append(r_new)
+      old_theta2 =  old_theta2 + dt2*(omegaa2 + r_new*np.sin(sum(old_theta2)/N2 - old_theta2))
+      theta_list_new.append(old_theta2)
+      print(t)
+
+## Plot time with coherence 
+for (i,j) in zip(range(0,len(order_par_new), 1000), range(1,10)):  
+    time_new = np.arange(0,50,0.05) 
+    plt.plot(time_new, order_par_new[i:i+1000], label ='Run' +str(j))
+    plt.ylim(0,1)
+    plt.xlabel('Time')
+    plt.ylabel('Coherence')
+    
+plt.legend()
+
+################## Fixed realisation of the initial conditions ########################
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+## Create empty list to store the new thetas'
+theta_list_new = []
+## Create empty list to store the new coherences
+order_par_new = []
+
+dt2 = 0.05 #timestep
+N2 = 2000 #number of oscilators
+
+## Theta0 taking values from a uniform distribution
+theta0 = np.random.uniform(0,2*np.pi,2000)
+old_theta2 = np.array(theta0)
+
+
+## For 10 runs
+for j in range(0,10):
+    old_theta2 = theta0 ## Keep theta as theta0 for all the runs 
+    omegaa2  = np.random.uniform(-1/2, 1/2, 2000) #change omega in every run from a uniform distribution
+    for t in np.arange(0,50,0.05): 
+      cos_new = 0
+      sin_new = 0
+      r_new = 0
+      cos_new = np.cos(old_theta2)
+      sin_new = np.sin(old_theta2)
+      mean_cos_new =np.mean(cos_new)
+      mean_sin_new= np.mean(sin_new)
+      r_new= np.sqrt(mean_cos_new**2 + mean_sin_new**2)
+      order_par_new.append(r_new)
+      old_theta2 =  old_theta2 + dt2*(omegaa2 + r_new*np.sin(sum(old_theta2)/N2 - old_theta2))
+      theta_list_new.append(old_theta2)
+      print(t)
+
+## Plot time with coherence 
+for (i,j) in zip(range(0,len(order_par_new), 1000), range(1,10)):  
+    time_new = np.arange(0,50,0.05) 
+    plt.plot(time_new, order_par_new[i:i+1000], label ='Run' +str(j))
+    plt.ylim(0,1)
+    plt.xlabel('Time')
+    plt.ylabel('Coherence')
+    
+plt.legend()
